@@ -1,5 +1,7 @@
 export interface Gene {
-  $update: () => any
+  $update?: () => any;
+  $init?: () => any;
+  $cell?: boolean;
 }
 
 export type Virus = (gene: Gene) => Gene;

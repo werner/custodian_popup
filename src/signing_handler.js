@@ -19,7 +19,6 @@ export function signingHandler(){
     _transactionJson: '',
     class: 'form',
     _rawtx: null,
-    _rskAddress: '0x7986b3df570230288501eea3d890bd66948c9b79',
     $update(){
       let self = this
       if (self._rawtx){

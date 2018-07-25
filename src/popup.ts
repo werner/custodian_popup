@@ -1,8 +1,5 @@
 import * as $ from "jquery";
 (<any>window).jQuery = (<any>window).$ = $;
-import * as _  from 'lodash';
-(<any>window)._ = _;
-(<any>window).nodeUrl = 'http://localhost:8000';
 import * as Popper from 'popper.js';
 (<any>window).Popper = Popper;
 import * as bitcoin from 'bitcoinjs-lib';
@@ -10,7 +7,7 @@ import * as bitcoin from 'bitcoinjs-lib';
 require('./lib/bootstrap.min.js');
 
 import * as device from './device.js';
-import {showInfo, showError, loading, notLoading} from './messages.js';
+import {showInfo, showError, loading, notLoading} from './messages';
 import {loadDeviceHandler} from './load_device_handler.js';
 import {multisigSetupHandler} from './multisig/index.js';
 import {signingHandler} from './signing_handler';
