@@ -1,6 +1,6 @@
-import { Virus, Gene } from '../types/index';
+import { Virus, Cell } from '../types/index';
 
-export function updateEpidemic (component: Gene): Gene {
+export function updateEpidemic (component: Cell): Cell {
 	let recursive_update = (node: ParentNode) => {
 		for(let n of [].slice.call(node.children)){
 			n.$update && n.$update()
