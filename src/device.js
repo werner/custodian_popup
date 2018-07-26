@@ -224,7 +224,7 @@ function waitForFirstDevice(list) {
   return res.catch(errorHandler(() => waitForFirstDevice(list)));
 }
 
-function resolveAfter(msec, value) {
+function resolveAfter(msec, value = 0) {
     return new Promise((resolve) => {
         setTimeout(resolve, msec, value);
     });

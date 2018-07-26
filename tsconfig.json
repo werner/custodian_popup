@@ -4,8 +4,9 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "es6",
-    "target": "es5",
-    "allowJs": true
+    "target": "es6",
+    "allowJs": true,
+    "lib": ["es5", "es2015", "dom", "scripthost"]
   },
   "include": [
     "./node_modules/web3-typescript-typings/index.d.ts"

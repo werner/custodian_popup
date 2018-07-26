@@ -1,10 +1,10 @@
 import * as _  from 'lodash';
 
-import * as device from '../device.js';
+import * as device from '../device';
 import {showError, showSuccess, loading, notLoading} from '../messages';
 import {blockdozerService} from '../services/blockdozer_service.js';
 import * as Web3 from 'web3';
-import * as EthereumTx from 'ethereumjs-tx';
+const EthereumTx = require('ethereumjs-tx');
 
 interface InTransaction {
   outputs: Array<object>;
@@ -117,7 +117,7 @@ export class Transaction {
   signTransaction (original_json: InTransaction, coin: string) {
     let json = _.cloneDeep(original_json)
     loading()
-    return device.run((d) => {
+    return device.run((d: device.Device) => {
       return d.session.signTx(json.inputs, json.outputs, json.transactions, coin)
         .then((res) => {
           let signed = res.message.serialized.serialized_tx
@@ -145,19 +145,19 @@ export class Transaction {
     })
   }
 
-  signRskTransaction(path, to, from, gasPriceGwei, gasLimitFromParam, value, data) {
-    let self = this
-    loading()
-    return device.run((d) => {
-      let web3 = self.getWeb3()
-      let count = null
-      self.getGasPrice((gasValue) => {
-        let gasPrice = gasPriceGwei === null ? `0${gasValue}` : gasPriceGwei * 1e9
-        let gasLimit = gasLimitFromParam  === null ? self.getGasLimit(data) : gasLimitFromParam
+  signRskTransaction(path: Array<number>, to: string, from: string, gasPriceGwei: number, gasLimitFromParam: string, value: string, data?: string) {
+    let self = this;
+    loading();
+    return device.run((d: device.Device) => {
+      let web3 = self.getWeb3();
+      let count = null;
+      self.getGasPrice((gasValue: number) => {
+        let gasPrice = gasPriceGwei === null ? `0${gasValue}` : gasPriceGwei * 1e9;
+        let gasLimit = gasLimitFromParam  === null ? self.getGasLimit(data) : gasLimitFromParam;
 
         self.getNonce(from).then(nonce => {
 
-          let gasLimitForTrezor = gasLimit.toString().length % 2 === 0 ? gasLimit.toString() : `0${gasLimit}`
+          let gasLimitForTrezor: string = gasLimit.toString().length % 2 === 0 ? gasLimit.toString() : `0${gasLimit}`;
 
           d.session.signEthTx(path, nonce, gasPrice.toString(), gasLimitForTrezor, to, value.toString(), null, 33).then(function (response) {
             let tx = {
@@ -198,7 +198,7 @@ export class Transaction {
     return 21000 + 68 * dataSizeInBytes
   }
 
-  getNonce(address) {
+  getNonce(address: string): Promise<string> {
     let web3 = this.getWeb3()
     return new Promise((resolve, reject) => {
       web3.eth.getTransactionCount(address, 'pending', function (error, result) {

@@ -11,8 +11,8 @@ var bip44 = require('bip44-constants')
 
 const CONFIG_URL = './config_signed.bin';
 
-export function run(callback, {omitPass} = {}){
-  return initDevice({omitPass})
+export function run(callback, omitPass: any = {}){
+  return initDevice(omitPass)
     .then(callback)
     .catch((error) => {
       showError(error)
@@ -20,7 +20,7 @@ export function run(callback, {omitPass} = {}){
     })
 }
 
-function initDevice({omitPass} = {}) {
+function initDevice(omitPass: any = {}) {
   return initTransport()
     .then((t) => resolveAfter(500, t))
     .then((t) => waitForFirstDevice(t))
@@ -56,9 +56,59 @@ function makeButtonCallback(device){
   }
 }
 
-interface Session {
+type MessageResponse<T> = {
+    type: string;
+    message: T;
+};
 
-}
+type HDPubNode = {
+    depth: number;
+    fingerprint: number;
+    child_num: number;
+    chain_code: string;
+    public_key: string;
+};
+
+type PublicKey = {
+    node: HDPubNode;
+    xpub: string;
+};
+
+type SignedTx = {
+    serialized: {
+        signatures: Array<string>;
+        serialized_tx: string;
+    }
+};
+
+type EthereumSignature = {
+  v: number,
+  r: string,
+  s: string,
+};
+
+interface Session {
+    getPublicKey: (address_n: Array<number>, coin?: string) => Promise<MessageResponse<PublicKey>>;
+    signTx(
+        inputs: Array<trezor.TransactionInput>,
+        outputs: Array<trezor.TransactionOutput>,
+        txs: Array<trezor.RefTransaction>,
+        coin: string,
+        locktime?: number,
+        overwinter?: boolean,
+    ): Promise<MessageResponse<SignedTx>>;
+
+    signEthTx(
+        address_n: Array<number>,
+        nonce: string,
+        gas_price: string,
+        gas_limit: string,
+        to: string,
+        value: string,
+        data?: string,
+        chain_id?: number
+    ): Promise<EthereumSignature>;
+};
 
 interface Feature {
   bootloader_mode: string;
@@ -66,9 +116,10 @@ interface Feature {
   major_version: number;
   minor_version: number;
   patch_version: number;
-}
+  coins: Array<{ coin_name: string }>;
+};
 
-class Device {
+export class Device {
   session: Session;
   features: Feature;
 
@@ -121,7 +172,7 @@ const FIRMWARE_IS_OLD = new Error('Firmware of connected device is too old');
 
 function errorHandler(retry) {
   return (error) => {
-    let never = new Promise(() => {});
+    const never = ()  => new Promise(() => {});
 
     switch (error) { // application errors
       case NO_TRANSPORT:
