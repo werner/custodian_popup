@@ -3,8 +3,10 @@ import * as bitcoin from 'bitcoinjs-lib'
 import {showError, showSuccess, loading, notLoading} from './messages.js'
 import {select_groupism, buttonism, form_groupism, cardism} from './lib/bootstrapism.js'
 import {update_epidemic} from './lib/update_epidemic.js'
+import * as networks from './networks.js'
 var bip32 = require('bip32-path')
 var _ = require('lodash')
+
 
 window.bitcoin = bitcoin
 
@@ -26,16 +28,19 @@ export function signingHandler(){
       }
     },
     $$: [
-      { $virus: select_groupism('Network', _.keys(bitcoin.networks), 'bitcoin'),
+      { $virus: select_groupism('Network', _.keys(networks), 'bitcoin'),
         name: 'network',
         $update(){ this.value = this._network_name },
         onchange(e){ this._network_name = e.target.value }
       },
-      { $tag: '.form-group textarea#tansaction_json.form-control',
+      { $tag: '.form-group textarea#transaction_json.form-control',
         name: 'transaction_json',
         rows: 15,
         $update(){
           this.$text = JSON.stringify(this._transaction_json, true, '  ')
+        },
+        onchange(e){ 
+          this._transaction_json = e.target.value 
         }
       },
       { $tag: 'button.btn.btn-primary.btn-block.mt-1',
@@ -48,7 +53,8 @@ export function signingHandler(){
           }
         },
         onclick(){
-          signTransaction(this._transaction_json, this._network_name)
+          let transaction_json = JSON.parse(document.getElementById('transaction_json').value);
+          signTransaction(transaction_json, this._network_name)
             .then(this._handle_signing_result)
         }
       },
@@ -152,6 +158,9 @@ function signTransaction(original_json, coin){
         }else{
           return { json: json, done: true, rawtx: signed }
         }
+      })
+      .catch((res) => {
+        return { json, done: true, rawtx: res }
       })
   })
 }
