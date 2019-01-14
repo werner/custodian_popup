@@ -7,7 +7,6 @@ import * as networks from './networks.js'
 var bip32 = require('bip32-path')
 var _ = require('lodash')
 
-
 window.bitcoin = bitcoin
 
 export function signingHandler(){
@@ -50,6 +49,8 @@ export function signingHandler(){
           this._rawtx = result.rawtx
           if(result.done){
             showSuccess("All signed, try to propagate rawtx")
+          } else {
+            showError(result.rawtx)
           }
         },
         onclick(){
@@ -160,7 +161,7 @@ function signTransaction(original_json, coin){
         }
       })
       .catch((res) => {
-        return { json, done: true, rawtx: res }
+        return { json, done: false, rawtx: res }
       })
   })
 }
